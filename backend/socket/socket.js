@@ -1,6 +1,7 @@
 import { Server } from "socket.io";
 import http from "http"
 import express from "express"
+// const socketIo = require('socket.io');
 
 const app = express()
 
@@ -33,4 +34,4 @@ io.on("connection", (socket) => {
     })
 })
 
-export {app, server}
+export {app, io, server}
