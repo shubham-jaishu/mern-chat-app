@@ -12,7 +12,7 @@ const SignUp = () => {
     gender: "",
   });
 
-  const {Loading, signup} = useSignup()
+  const { Loading, signup } = useSignup();
 
   const handleCheckboxChange = (gender) => {
     setInputs({ ...Inputs, gender });
@@ -20,7 +20,7 @@ const SignUp = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await signup(Inputs)
+    await signup(Inputs);
   };
 
   return (
@@ -37,7 +37,7 @@ const SignUp = () => {
             </label>
             <input
               type="text"
-              placeholder="Shubham Jaiswal"
+              placeholder="Enter Full Name"
               className="w-full input input-bordered h-10"
               value={Inputs.fullName}
               onChange={(e) =>
@@ -52,7 +52,7 @@ const SignUp = () => {
             </label>
             <input
               type="text"
-              placeholder="shubham_jaishu"
+              placeholder="Enter Username"
               className="w-full input input-bordered h-10"
               value={Inputs.username}
               onChange={(e) =>
@@ -82,7 +82,7 @@ const SignUp = () => {
             </label>
             <input
               type="password"
-              placeholder="Confirm Password"
+              placeholder="Enter Confirm Password"
               className="w-full input input-bordered h-10"
               value={Inputs.confirmPassword}
               onChange={(e) =>
@@ -104,8 +104,15 @@ const SignUp = () => {
           </Link>
 
           <div>
-            <button className="btn btn-block btn-sm mt-2 border border-slate-700" disabled={Loading}>
-              {Loading ? <span className="loading loading-spinner"></span> : "Sign Up"}             
+            <button
+              className="btn btn-block btn-sm mt-2 border border-slate-700"
+              disabled={Loading}
+            >
+              {Loading ? (
+                <span className="loading loading-spinner"></span>
+              ) : (
+                "Sign Up"
+              )}
             </button>
           </div>
         </form>
