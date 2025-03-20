@@ -76,12 +76,12 @@ This project is a modern chat application designed for real-time communication. 
 ### Steps
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/chat-app.git
+   git clone https://github.com/shubham-jaishu/mern-chat-app.git
    ```
 
 2. Navigate to the project directory:
    ```bash
-   cd chat-app
+   cd mern-chat-app
    ```
 
 3. Install dependencies:
