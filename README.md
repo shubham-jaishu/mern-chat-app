@@ -1,1 +1,1 @@
-# mern-chat-app
+Switch to Master instead of Main
