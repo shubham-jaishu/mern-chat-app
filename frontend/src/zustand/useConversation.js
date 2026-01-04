@@ -7,7 +7,15 @@ const useConversation = create((set) => ({
     setMessages: (messages) => set({ messages }),
     addMessage: (message) => set((state) => ({
         messages: [...state.messages, message]
-    }))
+    })),
+    lastMessage: {},
+    setLastMessage: (conversationId, text) =>
+        set((state) => ({
+            lastMessage: {
+                ...state.lastMessage,
+                [conversationId]: text,
+            },
+        })),
 }))
 
 export default useConversation
