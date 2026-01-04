@@ -20,18 +20,14 @@ export const getReceiverSocketId = (receiverId) => {
 const userSocketMap = {} 
 
 io.on("connection", (socket) => {
-    console.log("User connected with socket ID:", socket.id)
+    console.log("User connected:", socket.id)
 
     const userId = socket.handshake.query.userId
     
     if (userId && userId !== "undefined") {
         userSocketMap[userId] = socket.id
-        console.log(`User ${userId} mapped to socket ${socket.id}`)
-    } else {
-        console.warn("Connection attempt without valid userId")
     }
 
-    // Broadcast updated online users list
     io.emit("getOnlineUsers", Object.keys(userSocketMap))
 
     socket.on("disconnect", () => {

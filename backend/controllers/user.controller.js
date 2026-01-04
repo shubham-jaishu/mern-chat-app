@@ -1,8 +1,5 @@
 import User from "../models/user.model.js"
 
-/**
- * Get all users except the logged in user
- */
 export const getUsersForSidebar = async (req, res) => {
     try {
         const loggedInUserId = req.user._id

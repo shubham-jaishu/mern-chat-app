@@ -2,9 +2,6 @@ import Conversation from "../models/conversation.model.js";
 import Message from "../models/message.model.js";
 import { getReceiverSocketId, io } from "../socket/socket.js";
 
-/**
- * Send a message to another user
- */
 export const sendMessage = async (req, res) => {
 	try {
 		const { message } = req.body;
@@ -51,9 +48,6 @@ export const sendMessage = async (req, res) => {
 	}
 };
 
-/**
- * Get all messages between two users
- */
 export const getMessages = async (req, res) => {
 	try {
 		const { id: userToChatId } = req.params;

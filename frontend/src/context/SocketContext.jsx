@@ -15,13 +15,10 @@ export const SocketContextProvider = ({ children }) => {
 
   useEffect(() => {
     if (authUser) {
-      // Determine the socket server URL based on environment
       const socketURL = 
         process.env.NODE_ENV === "production"
-          ? window.location.origin  // Use same domain as frontend (e.g., https://my-app.onrender.com)
-          : "http://localhost:3500" // Local development
-
-      console.log("Connecting to socket server:", socketURL);
+          ? window.location.origin
+          : "http://localhost:3500"
 
       const socket = io(socketURL, {
         query: {
@@ -35,7 +32,7 @@ export const SocketContextProvider = ({ children }) => {
       });
 
       socket.on("connect", () => {
-        console.log("Socket connected:", socket.id);
+        console.log("Socket connected");
       });
 
       socket.on("disconnect", () => {

@@ -2,14 +2,10 @@ import User from '../models/user.model.js'
 import bcrypt from "bcryptjs"
 import generateTokenAndSetCookie from '../utils/generateToken.js'
 
-/**
- * Sign up a new user
- */
 export const signup = async (req, res) => {
     try {
         const { fullName, username, password, confirmPassword, gender } = req.body
 
-        // Validate input
         if (!fullName || !username || !password || !confirmPassword || !gender) {
             return res.status(400).json({ error: "All fields are required" })
         }
@@ -62,9 +58,6 @@ export const signup = async (req, res) => {
     }
 }
 
-/**
- * Login user
- */
 export const login = async (req, res) => {
     try {
         const { username, password } = req.body

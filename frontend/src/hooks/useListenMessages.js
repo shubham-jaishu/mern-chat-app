@@ -9,7 +9,6 @@ const useListenMessages = () => {
     const { addMessage } = useConversation()
 
     useEffect(() => {
-        // Only set up listener if socket exists
         if (!socket) return
 
         const handleNewMessage = (newMessage) => {
@@ -21,7 +20,6 @@ const useListenMessages = () => {
 
         socket.on("newMessage", handleNewMessage)
 
-        // Proper cleanup
         return () => {
             socket.off("newMessage", handleNewMessage)
         }
