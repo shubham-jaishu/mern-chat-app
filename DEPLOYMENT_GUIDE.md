@@ -212,7 +212,7 @@ For Render, set these in your Web Service environment variables:
 ```
 NODE_ENV=production
 PORT=10000 (Render assigns this)
-MONGO_DB_URI=mongodb+srv://user:password@cluster.mongodb.net/chatapp
+MONGO_DB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/chatapp
 JWT_SECRET=generate-a-random-string-here-minimum-32-characters
 CORS_ORIGIN=https://your-app-name.onrender.com
 ```

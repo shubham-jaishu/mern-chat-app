@@ -172,4 +172,4 @@ brew services start mongodb-community
 
 For MongoDB Atlas (cloud):
 - Ensure MONGO_DB_URI in `.env` points to your cluster
-- Example: `mongodb+srv://user:password@cluster.mongodb.net/chatapp`
+- Example: `mongodb+srv://<username>:<password>@<cluster>.mongodb.net/chatapp`
