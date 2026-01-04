@@ -16,7 +16,8 @@ const useListenMessages = () => {
             const sound = new Audio(notificationSound)
             sound.play()
             addMessage(newMessage)
-            setLastMessage(newMessage.senderId, newMessage.message)
+            const messageText = newMessage.message || (newMessage.imageUrl ? "📷 Image" : "")
+            setLastMessage(newMessage.senderId, messageText)
         }
 
         const handleTyping = (data) => {
