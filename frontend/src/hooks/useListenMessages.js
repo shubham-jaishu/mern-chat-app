@@ -6,7 +6,7 @@ import notificationSound from "../assets/sounds/notification.mp3"
 
 const useListenMessages = () => {
     const { socket } = useSocketContext()
-    const { addMessage, setLastMessage, selectedConversation } = useConversation()
+    const { addMessage, setLastMessage, selectedConversation, messages, setMessages } = useConversation()
 
     useEffect(() => {
         if (!socket) return
@@ -29,16 +29,36 @@ const useListenMessages = () => {
             window.dispatchEvent(event)
         }
 
+        const handleReactionAdded = (data) => {
+            console.log("Reaction added received:", data)
+            const updatedMessages = messages.map((msg) =>
+                msg._id === data.messageId ? { ...msg, reactions: data.reactions } : msg
+            )
+            setMessages(updatedMessages)
+        }
+
+        const handleReactionRemoved = (data) => {
+            console.log("Reaction removed received:", data)
+            const updatedMessages = messages.map((msg) =>
+                msg._id === data.messageId ? { ...msg, reactions: data.reactions } : msg
+            )
+            setMessages(updatedMessages)
+        }
+
         socket.on("newMessage", handleNewMessage)
         socket.on("userTyping", handleTyping)
         socket.on("userStoppedTyping", handleStoppedTyping)
+        socket.on("reactionAdded", handleReactionAdded)
+        socket.on("reactionRemoved", handleReactionRemoved)
 
         return () => {
             socket.off("newMessage", handleNewMessage)
             socket.off("userTyping", handleTyping)
             socket.off("userStoppedTyping", handleStoppedTyping)
+            socket.off("reactionAdded", handleReactionAdded)
+            socket.off("reactionRemoved", handleReactionRemoved)
         }
-    }, [socket, addMessage, setLastMessage])
+    }, [socket, addMessage, setLastMessage, messages, setMessages])
 }
 
 export default useListenMessages

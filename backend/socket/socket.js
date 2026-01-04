@@ -26,9 +26,16 @@ io.on("connection", (socket) => {
     
     if (userId && userId !== "undefined") {
         userSocketMap[userId] = socket.id
+        console.log("User mapped:", userId, "->", socket.id)
     }
 
     io.emit("getOnlineUsers", Object.keys(userSocketMap))
+
+    socket.on("joinConversation", (data) => {
+        const conversationId = data.conversationId
+        socket.join(conversationId)
+        console.log("User", userId, "joined conversation room:", conversationId)
+    })
 
     socket.on("userTyping", (data) => {
         const receiverSocketId = getReceiverSocketId(data.receiverId)

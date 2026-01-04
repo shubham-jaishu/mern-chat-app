@@ -5,7 +5,7 @@ import Message from "./Message";
 import useListenMessages from "../../hooks/useListenMessages";
 
 const Messages = () => {
-  const { messages, loading } = useGetMessages();
+  const { messages, loading, setMessages } = useGetMessages();
   const [isTyping, setIsTyping] = useState(false);
 
   useListenMessages();
@@ -60,24 +60,3 @@ const Messages = () => {
 };
 
 export default Messages;
-
-// STARTER CODE SNIPPET
-// import Message from "./Message";
-
-// const Messages = () => {
-//   return <div className="px-4 flex-1 overflow-auto">
-//     <Message/>
-//     <Message/>
-//     <Message/>
-//     <Message/>
-//     <Message/>
-//     <Message/>
-//     <Message/>
-//     <Message/>
-//     <Message/>
-//     <Message/>
-//     <Message/>
-//   </div>;
-// };
-
-// export default Messages;

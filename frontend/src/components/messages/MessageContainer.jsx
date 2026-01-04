@@ -4,14 +4,23 @@ import MessageInput from "./MessageInput";
 import Messages from "./Messages";
 import { TiMessages } from "react-icons/ti";
 import { useAuthContext } from "../../context/AuthContext";
+import { useSocketContext } from "../../context/SocketContext";
 
 const MessageContainer = () => {
-  // const noChatSelected = true;
-  const {selectedConversation, setSelectedConversation} = useConversation()
+  const { selectedConversation, setSelectedConversation } = useConversation()
+  const { socket } = useSocketContext()
 
   useEffect(() => {
     return () => setSelectedConversation(null)
   }, [setSelectedConversation])
+
+  useEffect(() => {
+    if (selectedConversation && socket) {
+      socket.emit("joinConversation", {
+        conversationId: selectedConversation._id
+      })
+    }
+  }, [selectedConversation, socket])
 
   return (
     <div className="md:min-w-[800px] flex flex-col">

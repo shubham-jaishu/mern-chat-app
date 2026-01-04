@@ -16,6 +16,8 @@ const useConversation = create((set) => ({
                 [conversationId]: text,
             },
         })),
+    openReactionMessageId: null,
+    setOpenReactionMessageId: (messageId) => set({ openReactionMessageId: messageId }),
 }))
 
 export default useConversation
