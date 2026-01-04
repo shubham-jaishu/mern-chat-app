@@ -2,10 +2,15 @@ import { useAuthContext } from "../../context/AuthContext"
 import useConversation from "../../zustand/useConversation"
 import { extractTime } from "../../utils/extractTime"
 import { MdEmojiEmotions } from "react-icons/md"
+import { MdDelete } from "react-icons/md"
+import { MdEdit } from "react-icons/md"
+import { useState } from "react"
 
 const Message = ({ message }) => {
     const { authUser } = useAuthContext()
     const { selectedConversation, openReactionMessageId, setOpenReactionMessageId, messages, setMessages } = useConversation()
+    const [isEditing, setIsEditing] = useState(false)
+    const [editText, setEditText] = useState(message.message)
     const fromMe = message.senderId === authUser._id
     const formattedTime = extractTime(message.createdAt)
     const chatClassName = fromMe ? "chat-end" : "chat-start"
@@ -66,6 +71,78 @@ const Message = ({ message }) => {
 
     const reactionCounts = getReactionCounts()
 
+    const handleDelete = async () => {
+        if (!window.confirm("Are you sure you want to delete this message?")) return
+
+        try {
+            const response = await fetch(`/api/messages/${message._id}`, {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" }
+            })
+            
+            if (!response.ok) {
+                const errorText = await response.text()
+                console.error("Delete error response:", errorText)
+                throw new Error(`Failed to delete message: ${response.status}`)
+            }
+            
+            // Update local state
+            setMessages(
+                messages.map((msg) =>
+                    msg._id === message._id ? { ...msg, isDeleted: true } : msg
+                )
+            )
+        } catch (error) {
+            console.log("Error deleting message:", error)
+        }
+    }
+
+    const handleEditSubmit = async () => {
+        if (!editText.trim()) {
+            setIsEditing(false)
+            return
+        }
+
+        try {
+            const response = await fetch(`/api/messages/${message._id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: editText })
+            })
+            
+            if (!response.ok) {
+                const errorText = await response.text()
+                console.error("Edit error response:", errorText)
+                throw new Error(`Failed to edit message: ${response.status}`)
+            }
+            
+            // Update local state
+            setMessages(
+                messages.map((msg) =>
+                    msg._id === message._id ? { ...msg, message: editText, editedAt: new Date() } : msg
+                )
+            )
+            setIsEditing(false)
+        } catch (error) {
+            console.log("Error editing message:", error)
+        }
+    }
+
+    if (message.isDeleted) {
+        return (
+            <div className={`chat ${chatClassName}`}>
+                <div className="chat-image avatar">
+                    <div className="w-10 rounded-full">
+                        <img src={profilePic} alt="avatar" />
+                    </div>
+                </div>
+                <div className="chat-bubble text-gray-400 italic">
+                    This message was deleted
+                </div>
+            </div>
+        )
+    }
+
     return (
         <div className={`chat ${chatClassName}`}>
             <div className="chat-image avatar">
@@ -75,43 +152,93 @@ const Message = ({ message }) => {
             </div>
 
             <div className="relative group">
-                <div className={`chat-bubble text-white ${bubbleBgColor} ${shakeClass} pb-2`}>
-                    {message.message}
-                </div>
+                {isEditing ? (
+                    <div className="flex gap-2 items-center">
+                        <input
+                            type="text"
+                            value={editText}
+                            onChange={(e) => setEditText(e.target.value)}
+                            className="bg-gray-700 text-white rounded px-3 py-2 flex-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            autoFocus
+                        />
+                        <button
+                            onClick={handleEditSubmit}
+                            className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm"
+                        >
+                            Save
+                        </button>
+                        <button
+                            onClick={() => {
+                                setIsEditing(false)
+                                setEditText(message.message)
+                            }}
+                            className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded text-sm"
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                ) : (
+                    <>
+                        <div className={`chat-bubble text-white ${bubbleBgColor} ${shakeClass} pb-2`}>
+                            {message.message}
+                            {message.editedAt && (
+                                <div className="text-xs opacity-70 mt-1">(edited)</div>
+                            )}
+                        </div>
 
-                <button
-                    onClick={() => setOpenReactionMessageId(isReactionOpen ? null : message._id)}
-                    className="absolute -top-3 -right-8 bg-gray-700 hover:bg-gray-600 rounded-full p-2 text-lg opacity-0 group-hover:opacity-100 transition-opacity z-20"
-                >
-                    <MdEmojiEmotions />
-                </button>
-
-                {isReactionOpen && (
-                    <div className={`absolute -top-14 ${fromMe ? 'right-0' : 'left-0'} bg-gray-800 rounded-lg p-2 flex gap-1 shadow-lg border border-gray-600 z-30 whitespace-nowrap`}>
-                        {reactionEmojis.map((emoji) => (
+                        <div className="absolute -top-8 -right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                             <button
-                                key={emoji}
-                                onClick={() => handleReaction(emoji)}
-                                className="text-xl hover:bg-gray-700 p-1 rounded transition"
+                                onClick={() => setOpenReactionMessageId(isReactionOpen ? null : message._id)}
+                                className="bg-gray-700 hover:bg-gray-600 rounded-full p-2 text-lg"
                             >
-                                {emoji}
+                                <MdEmojiEmotions />
                             </button>
-                        ))}
-                    </div>
-                )}
+                            {fromMe && (
+                                <>
+                                    <button
+                                        onClick={() => setIsEditing(true)}
+                                        className="bg-gray-700 hover:bg-gray-600 rounded-full p-2 text-lg"
+                                    >
+                                        <MdEdit />
+                                    </button>
+                                    <button
+                                        onClick={handleDelete}
+                                        className="bg-gray-700 hover:bg-red-600 rounded-full p-2 text-lg"
+                                    >
+                                        <MdDelete />
+                                    </button>
+                                </>
+                            )}
+                        </div>
 
-                {Object.keys(reactionCounts).length > 0 && (
-                    <div className="flex gap-1 mt-1 flex-wrap">
-                        {Object.entries(reactionCounts).map(([emoji, count]) => (
-                            <div
-                                key={emoji}
-                                className="bg-gray-700 rounded-full px-2 py-0.5 text-xs flex items-center gap-1"
-                            >
-                                <span>{emoji}</span>
-                                {count > 1 && <span className="text-gray-300">{count}</span>}
+                        {isReactionOpen && (
+                            <div className={`absolute -top-14 ${fromMe ? 'right-0' : 'left-0'} bg-gray-800 rounded-lg p-2 flex gap-1 shadow-lg border border-gray-600 z-30 whitespace-nowrap`}>
+                                {reactionEmojis.map((emoji) => (
+                                    <button
+                                        key={emoji}
+                                        onClick={() => handleReaction(emoji)}
+                                        className="text-xl hover:bg-gray-700 p-1 rounded transition"
+                                    >
+                                        {emoji}
+                                    </button>
+                                ))}
                             </div>
-                        ))}
-                    </div>
+                        )}
+
+                        {Object.keys(reactionCounts).length > 0 && (
+                            <div className="flex gap-1 mt-1 flex-wrap">
+                                {Object.entries(reactionCounts).map(([emoji, count]) => (
+                                    <div
+                                        key={emoji}
+                                        className="bg-gray-700 rounded-full px-2 py-0.5 text-xs flex items-center gap-1"
+                                    >
+                                        <span>{emoji}</span>
+                                        {count > 1 && <span className="text-gray-300">{count}</span>}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
 

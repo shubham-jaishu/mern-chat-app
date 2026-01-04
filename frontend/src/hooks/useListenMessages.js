@@ -45,11 +45,29 @@ const useListenMessages = () => {
             setMessages(updatedMessages)
         }
 
+        const handleMessageDeleted = (data) => {
+            console.log("Message deleted received:", data)
+            const updatedMessages = messages.map((msg) =>
+                msg._id === data.messageId ? { ...msg, isDeleted: true } : msg
+            )
+            setMessages(updatedMessages)
+        }
+
+        const handleMessageEdited = (data) => {
+            console.log("Message edited received:", data)
+            const updatedMessages = messages.map((msg) =>
+                msg._id === data.messageId ? { ...msg, message: data.message, editedAt: data.editedAt } : msg
+            )
+            setMessages(updatedMessages)
+        }
+
         socket.on("newMessage", handleNewMessage)
         socket.on("userTyping", handleTyping)
         socket.on("userStoppedTyping", handleStoppedTyping)
         socket.on("reactionAdded", handleReactionAdded)
         socket.on("reactionRemoved", handleReactionRemoved)
+        socket.on("messageDeleted", handleMessageDeleted)
+        socket.on("messageEdited", handleMessageEdited)
 
         return () => {
             socket.off("newMessage", handleNewMessage)
@@ -57,6 +75,8 @@ const useListenMessages = () => {
             socket.off("userStoppedTyping", handleStoppedTyping)
             socket.off("reactionAdded", handleReactionAdded)
             socket.off("reactionRemoved", handleReactionRemoved)
+            socket.off("messageDeleted", handleMessageDeleted)
+            socket.off("messageEdited", handleMessageEdited)
         }
     }, [socket, addMessage, setLastMessage, messages, setMessages])
 }

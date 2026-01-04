@@ -177,3 +177,101 @@ export const removeReaction = async (req, res) => {
 		res.status(500).json({ error: "Internal server error" });
 	}
 };
+
+export const deleteMessage = async (req, res) => {
+	try {
+		console.log("DELETE request received, params:", req.params);
+		const { messageId } = req.params;
+		const userId = req.user._id;
+
+		console.log("Deleting message:", messageId, "by user:", userId);
+		const message = await Message.findById(messageId);
+
+		if (!message) {
+			return res.status(404).json({ error: "Message not found" });
+		}
+
+		// Only sender can delete
+		if (message.senderId.toString() !== userId.toString()) {
+			return res.status(403).json({ error: "You can only delete your own messages" });
+		}
+
+		message.isDeleted = true;
+		await message.save();
+
+		// Broadcast to both users
+		const receiverSocketId = getReceiverSocketId(message.receiverId);
+		const senderSocketId = getReceiverSocketId(message.senderId);
+
+		const deleteData = {
+			messageId: message._id,
+			isDeleted: true
+		};
+
+		if (receiverSocketId) {
+			io.to(receiverSocketId).emit("messageDeleted", deleteData);
+		}
+
+		if (senderSocketId) {
+			io.to(senderSocketId).emit("messageDeleted", deleteData);
+		}
+
+		res.status(200).json({ message: "Message deleted successfully" });
+	} catch (error) {
+		console.log("Error in deleteMessage controller:", error.message);
+		res.status(500).json({ error: "Internal server error" });
+	}
+};
+
+export const editMessage = async (req, res) => {
+	try {
+		console.log("PUT request received, params:", req.params, "body:", req.body);
+		const { messageId } = req.params;
+		const { message: newMessage } = req.body;
+		const userId = req.user._id;
+
+		console.log("Editing message:", messageId, "by user:", userId);
+
+		if (!newMessage || !newMessage.trim()) {
+			return res.status(400).json({ error: "Message cannot be empty" });
+		}
+
+		const message = await Message.findById(messageId);
+
+		if (!message) {
+			return res.status(404).json({ error: "Message not found" });
+		}
+
+		// Only sender can edit
+		if (message.senderId.toString() !== userId.toString()) {
+			return res.status(403).json({ error: "You can only edit your own messages" });
+		}
+
+		message.message = newMessage;
+		message.editedAt = new Date();
+		await message.save();
+
+		// Broadcast to both users
+		const receiverSocketId = getReceiverSocketId(message.receiverId);
+		const senderSocketId = getReceiverSocketId(message.senderId);
+
+		const editData = {
+			messageId: message._id,
+			message: message.message,
+			editedAt: message.editedAt
+		};
+
+		if (receiverSocketId) {
+			io.to(receiverSocketId).emit("messageEdited", editData);
+		}
+
+		if (senderSocketId) {
+			io.to(senderSocketId).emit("messageEdited", editData);
+		}
+
+		res.status(200).json(message);
+	} catch (error) {
+		console.log("Error in editMessage controller:", error.message);
+		res.status(500).json({ error: "Internal server error" });
+	}
+};
