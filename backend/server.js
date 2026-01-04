@@ -17,6 +17,7 @@ const PORT = process.env.PORT || 5000;
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
+const projectRoot = path.resolve(__dirname, "..")
 
 // Rate limiting middleware
 const limiter = rateLimit({
@@ -38,10 +39,12 @@ app.use("/api/auth", authRoutes)
 app.use("/api/messages", messageRoutes)
 app.use("/api/users", userRoutes)
 
-app.use(express.static(path.join(__dirname, "/frontend/dist")))
+// Serve frontend static files
+app.use(express.static(path.join(projectRoot, "frontend/dist")))
 
+// SPA fallback - serve index.html for all routes
 app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"))
+    res.sendFile(path.join(projectRoot, "frontend/dist/index.html"))
 })
 
 server.listen(PORT, () => {
