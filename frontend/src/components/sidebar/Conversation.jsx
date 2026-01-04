@@ -34,31 +34,50 @@ const Conversation = ({ conversation, lastIdx, emoji }) => {
 
   return (
     <>
-      <div className={`flex gap-2 items-center hover:bg-sky-500 rounded p-2 py-1 cursor-pointer transition
-        ${isSelected ? "bg-sky-500" : ""}
-      `}
+      <div
+        className={`flex gap-3 items-center px-3 py-2 rounded-lg cursor-pointer transition-all duration-200 backdrop-blur-sm
+          ${isSelected 
+            ? "bg-gradient-to-r from-sky-600 to-blue-600 shadow-lg shadow-blue-500/30" 
+            : "hover:bg-gray-700/40 bg-gray-800/20"
+          }
+        `}
         onClick={() => setSelectedConversation(conversation)}
       >
-        <div className={`avatar ${isOnline ? "online" : "offline"}`}>
-          <div className="w-12 rounded-full">
-            <img src={conversation.profilePic} alt="user avatar" />
+        <div className={`relative flex-shrink-0`}>
+          <div className={`avatar ${isOnline ? "online" : "offline"}`}>
+            <div className="w-14 rounded-full ring-2 ring-gray-700 hover:ring-blue-500 transition-all">
+              <img src={conversation.profilePic} alt="user avatar" />
+            </div>
           </div>
         </div>
-        <div className="flex flex-col flex-1">
-          <div className="flex gap-3 justify-between items-start">
-            <p className="font-bold text-gray-200">{conversation.fullName}</p>
-            <span className="text-xl">{emoji}</span>
+
+        <div className="flex flex-col flex-1 min-w-0 gap-1">
+          <div className="flex items-center gap-2 justify-between">
+            <p className="font-bold text-gray-100 text-sm truncate">{conversation.fullName}</p>
+            <span className="text-3xl flex-shrink-0">{emoji}</span>
           </div>
-          <div className="text-sm text-gray-400 truncate">
+          
+          <p className={`text-xs truncate transition-colors duration-200 ${
+            isTyping 
+              ? "text-blue-400 font-semibold italic" 
+              : isSelected
+              ? "text-gray-100"
+              : "text-gray-400"
+          }`}>
             {isTyping ? (
-              <span className="text-blue-400 italic">typing...</span>
+              <span className="flex items-center gap-1">
+                <span className="inline-block w-1 h-1 bg-blue-400 rounded-full animate-bounce"></span>
+                <span className="inline-block w-1 h-1 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></span>
+                <span className="inline-block w-1 h-1 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></span>
+                <span>typing...</span>
+              </span>
             ) : (
-              lastMessage?.[conversation._id]?.slice(0, 30) || "Start conversation"
+              lastMessage?.[conversation._id]?.slice(0, 45) || "Start a conversation"
             )}
-          </div>
+          </p>
         </div>
       </div>
-      {!lastIdx && <div className="divider my-0 py-0 h-1" />}
+      {!lastIdx && <div className="my-2 border-t border-gray-700/50" />}
     </>
   );
 };
