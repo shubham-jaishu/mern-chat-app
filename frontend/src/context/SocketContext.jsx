@@ -15,7 +15,15 @@ export const SocketContextProvider = ({ children }) => {
 
   useEffect(() => {
     if (authUser) {
-      const socket = io("https://chat-app-e5so.onrender.com", {
+      // Determine the socket server URL based on environment
+      const socketURL = 
+        process.env.NODE_ENV === "production"
+          ? window.location.origin  // Use same domain as frontend (e.g., https://my-app.onrender.com)
+          : "http://localhost:3500" // Local development
+
+      console.log("Connecting to socket server:", socketURL);
+
+      const socket = io(socketURL, {
         query: {
           userId: authUser._id,
         },
@@ -24,6 +32,14 @@ export const SocketContextProvider = ({ children }) => {
 
       socket.on("getOnlineUsers", (users) => {
         setOnlineUsers(users);
+      });
+
+      socket.on("connect", () => {
+        console.log("Socket connected:", socket.id);
+      });
+
+      socket.on("disconnect", () => {
+        console.log("Socket disconnected");
       });
 
       return () => socket.close();

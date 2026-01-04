@@ -1,13 +1,27 @@
 import User from '../models/user.model.js'
-import bcrypt from "bcryptjs" //for password encryption in mongodb
+import bcrypt from "bcryptjs"
 import generateTokenAndSetCookie from '../utils/generateToken.js'
 
+/**
+ * Sign up a new user
+ */
 export const signup = async (req, res) => {
     try {
         const { fullName, username, password, confirmPassword, gender } = req.body
-        if (password !== confirmPassword) {
-            return res.status(400).json({ error: "Password don't match" })
+
+        // Validate input
+        if (!fullName || !username || !password || !confirmPassword || !gender) {
+            return res.status(400).json({ error: "All fields are required" })
         }
+
+        if (password !== confirmPassword) {
+            return res.status(400).json({ error: "Passwords do not match" })
+        }
+
+        if (password.length < 6) {
+            return res.status(400).json({ error: "Password must be at least 6 characters" })
+        }
+
         const user = await User.findOne({ username })
         if (user) {
             return res.status(400).json({ error: "Username already exists" })
@@ -43,14 +57,22 @@ export const signup = async (req, res) => {
 
     }
     catch (err) {
-        console.log("Error in login controller", err.message)
-        res.status(500).json({ err: "Internal Server Error" })
+        console.log("Error in signup controller:", err.message)
+        res.status(500).json({ error: "Internal Server Error" })
     }
 }
 
+/**
+ * Login user
+ */
 export const login = async (req, res) => {
     try {
         const { username, password } = req.body
+
+        if (!username || !password) {
+            return res.status(400).json({ error: "Username and password are required" })
+        }
+
         const user = await User.findOne({ username })
         const isPasswordCorrect = await bcrypt.compare(password, user?.password || "")
 
@@ -68,18 +90,18 @@ export const login = async (req, res) => {
         })
     }
     catch (err) {
-        console.log("Error in signup controller", err.message)
-        res.status(500).json({ err: "Internal Server Error" })
+        console.log("Error in login controller:", err.message)
+        res.status(500).json({ error: "Internal Server Error" })
     }
 }
 
 export const logout = (req, res) => {
-    try{
-        res.cookie("jwt", "", {maxAge: 0})
-        res.status(200).json({message: "Logged out successfully"})
+    try {
+        res.cookie("jwt", "", { maxAge: 0 })
+        res.status(200).json({ message: "Logged out successfully" })
     }
-    catch(err){
-        console.log("Error in logout controller", err.message)
-        res.status(500).json({ err: "Internal Server Error" })
+    catch (err) {
+        console.log("Error in logout controller:", err.message)
+        res.status(500).json({ error: "Internal Server Error" })
     }
 }
