@@ -1,5 +1,5 @@
 export const formatLastSeen = (lastSeenDate) => {
-    if (!lastSeenDate) return "Never";
+    if (!lastSeenDate) return "Never seen";
 
     const now = new Date();
     const lastSeen = new Date(lastSeenDate);
