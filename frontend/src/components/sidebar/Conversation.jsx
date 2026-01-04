@@ -1,6 +1,7 @@
 import { useSocketContext } from "../../context/SocketContext";
 import useConversation from "../../zustand/useConversation";
 import { useState, useEffect } from "react";
+import { formatLastSeen } from "../../utils/formatLastSeen";
 
 const Conversation = ({ conversation, lastIdx, emoji }) => {
   const { selectedConversation, setSelectedConversation, lastMessage } = useConversation();
@@ -54,6 +55,9 @@ const Conversation = ({ conversation, lastIdx, emoji }) => {
         <div className="flex flex-col flex-1 min-w-0 gap-1">
           <div className="flex items-center gap-2 justify-between">
             <p className="font-bold text-gray-100 text-sm truncate">{conversation.fullName}</p>
+            <span className={`text-sm font-semibold ${isOnline ? "text-green-400" : "text-gray-400"}`}>
+              {isOnline ? "Active" : formatLastSeen(conversation.lastSeen)}
+            </span>
             <span className="text-3xl flex-shrink-0">{emoji}</span>
           </div>
           

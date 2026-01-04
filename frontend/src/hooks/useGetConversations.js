@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
+import { useSocketContext } from "../context/SocketContext"
 
 const useGetConversations = () => {
     const [loading, setLoading] = useState(false)
     const [conversations, setConversations] = useState([])
+    const { onlineUsers } = useSocketContext()
 
     useEffect(() => {
         const getConversations = async () => {
@@ -24,7 +26,7 @@ const useGetConversations = () => {
             }
         }
         getConversations()
-    }, [])
+    }, [onlineUsers]) // Refetch when online users change
     return { loading, conversations }
 }
 

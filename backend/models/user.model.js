@@ -23,6 +23,10 @@ const userSchema = new mongoose.Schema({
     profilePic: {
         type: String,
         default: ""
+    },
+    lastSeen: {
+        type: Date,
+        default: () => new Date()
     }
 }, { timestamps: true })
 
