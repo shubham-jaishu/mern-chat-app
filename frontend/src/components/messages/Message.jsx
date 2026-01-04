@@ -20,22 +20,21 @@ const Message = ({ message }) => {
 
     const handleReaction = async (emoji) => {
         try {
-            // Optimistic update - update immediately
-            const existingReactionIndex = message.reactions?.findIndex(
-                (r) => r.userId === authUser._id && r.emoji === emoji
+            // Check if user already has any reaction on this message
+            const userExistingReaction = message.reactions?.find(
+                (r) => r.userId === authUser._id
             );
 
-            let updatedReactions;
-            if (existingReactionIndex !== -1) {
-                updatedReactions = message.reactions.filter(
-                    (_, idx) => idx !== existingReactionIndex
-                );
-            } else {
-                updatedReactions = [
-                    ...(message.reactions || []),
-                    { emoji, userId: authUser._id }
-                ];
-            }
+            // Remove all user reactions first, then add new one
+            let updatedReactions = message.reactions?.filter(
+                (r) => r.userId !== authUser._id
+            ) || [];
+
+            // Only add new emoji if it's different from existing, or if no existing
+            updatedReactions = [
+                ...updatedReactions,
+                { emoji, userId: authUser._id }
+            ];
 
             // Update local state immediately
             setMessages(
@@ -109,7 +108,7 @@ const Message = ({ message }) => {
                                 className="bg-gray-700 rounded-full px-2 py-0.5 text-xs flex items-center gap-1"
                             >
                                 <span>{emoji}</span>
-                                <span className="text-gray-300">{count}</span>
+                                {count > 1 && <span className="text-gray-300">{count}</span>}
                             </div>
                         ))}
                     </div>
