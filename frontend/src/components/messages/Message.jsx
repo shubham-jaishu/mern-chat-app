@@ -17,8 +17,17 @@ const Message = ({ message }) => {
     const profilePic = fromMe ? authUser.profilePic : selectedConversation?.profilePic
     const bubbleBgColor = fromMe ? "bg-blue-500" : ""
 
-    const shakeClass = message.shouldShake ? "shake" : ""
+    // Debug logging
+    if (message.imageUrl) {
+        console.log("Message with image:", message._id, "imageUrl:", message.imageUrl);
+    } else {
+        if (message.message && message.message.length > 0) {
+            console.log("Text message:", message._id);
+        }
+    }
+    console.log("Full message object:", message);
 
+    const shakeClass = message.shouldShake ? "shake" : ""
     const reactionEmojis = ["👍", "❤️", "😂", "😮", "😢", "🔥", "😍", "👏"]
 
     const isReactionOpen = openReactionMessageId === message._id;
@@ -179,10 +188,29 @@ const Message = ({ message }) => {
                     </div>
                 ) : (
                     <>
-                        <div className={`chat-bubble text-white ${bubbleBgColor} ${shakeClass} pb-2`}>
-                            {message.message}
-                            {message.editedAt && (
-                                <div className="text-xs opacity-70 mt-1">(edited)</div>
+                        <div className={`chat-bubble text-white ${bubbleBgColor} ${shakeClass} p-0 overflow-hidden`}>
+                            {message.imageUrl && (
+                                <img
+                                    src={message.imageUrl}
+                                    alt="Shared image"
+                                    className="max-w-xs rounded-lg cursor-pointer hover:opacity-80 transition block"
+                                    onClick={() => window.open(message.imageUrl, "_blank")}
+                                    onError={(e) => {
+                                        console.warn("Could not load image:", message.imageUrl);
+                                        e.target.alt = "Image failed to load";
+                                    }}
+                                />
+                            )}
+                            {message.message && (
+                                <div className="px-4 py-2">
+                                    <p>{message.message}</p>
+                                    {message.editedAt && (
+                                        <div className="text-xs opacity-70 mt-1">(edited)</div>
+                                    )}
+                                </div>
+                            )}
+                            {!message.message && message.editedAt && (
+                                <div className="px-4 py-2 text-xs opacity-70">(edited)</div>
                             )}
                         </div>
 

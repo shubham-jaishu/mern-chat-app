@@ -9,6 +9,9 @@ export default defineConfig({
     proxy: {
       "/api": {
         target: "http://localhost:3500"
+      },
+      "/uploads": {
+        target: "http://localhost:3500"
       }
     }
   }

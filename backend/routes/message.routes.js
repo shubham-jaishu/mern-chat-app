@@ -1,6 +1,7 @@
 import express from "express"
 import { sendMessage, getMessages, addReaction, removeReaction, deleteMessage, editMessage } from "../controllers/message.controller.js"
 import protectRoute from "../middleware/protectRoute.js"
+import upload from "../middleware/uploadMiddleware.js"
 
 const router = express.Router()
 
@@ -10,8 +11,17 @@ router.use((req, res, next) => {
     next();
 });
 
+// Custom error handler for multer
+const handleMulterError = (err, req, res, next) => {
+    if (err) {
+        console.error("Multer error:", err.message);
+        return res.status(400).json({ error: err.message || "File upload error" });
+    }
+    next();
+};
+
 // POST routes (specific patterns first)
-router.post("/send/:id", protectRoute, sendMessage)
+router.post("/send/:id", protectRoute, upload.single("image"), handleMulterError, sendMessage)
 router.post("/reaction/add/:messageId", protectRoute, addReaction)
 router.post("/reaction/remove/:messageId", protectRoute, removeReaction)
 
