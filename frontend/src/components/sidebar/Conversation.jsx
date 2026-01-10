@@ -46,8 +46,16 @@ const Conversation = ({ conversation, lastIdx, emoji }) => {
       >
         <div className={`relative flex-shrink-0`}>
           <div className={`avatar ${isOnline ? "online" : "offline"}`}>
-            <div className="w-14 rounded-full ring-2 ring-gray-700 hover:ring-blue-500 transition-all">
-              <img src={conversation.profilePic} alt="user avatar" />
+            <div className="w-14 rounded-full ring-2 ring-gray-700 hover:ring-blue-500 transition-all bg-gray-600 flex items-center justify-center overflow-hidden">
+              <img 
+                src={
+                  conversation.profilePic && conversation.profilePic.trim() !== "" 
+                    ? conversation.profilePic
+                    : `https://ui-avatars.com/api/?name=${encodeURIComponent(conversation.fullName)}&background=random&bold=true`
+                }
+                alt="user avatar" 
+                className="w-full h-full object-cover"
+              />
             </div>
           </div>
         </div>
