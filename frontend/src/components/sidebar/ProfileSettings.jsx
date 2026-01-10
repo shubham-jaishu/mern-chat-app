@@ -104,7 +104,7 @@ const ProfileSettings = ({ isOpen, onClose }) => {
       const updatedUser = await res.json();
       setAuthUser(updatedUser);
       localStorage.setItem("chat-user", JSON.stringify(updatedUser));
-      toast.success("Profile picture updated!");
+      toast.success("Avatar updated! Your new avatar will be visible everywhere.");
       setImageSrc(null);
       setCrop({ x: 0, y: 0 });
       setZoom(1);

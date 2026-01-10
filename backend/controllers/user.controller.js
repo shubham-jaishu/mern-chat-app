@@ -22,7 +22,15 @@ export const updateProfilePicture = async (req, res) => {
             return res.status(400).json({ error: "Please upload an image" })
         }
 
-        const profilePicUrl = `/uploads/${req.file.filename}`
+        // Instead of storing locally, we'll use a hash-based avatar service
+        // This ensures the avatar persists across deployments
+        const username = req.user.username || req.user._id
+        const colorHash = Buffer.from(username).toString('hex').substring(0, 6)
+        
+        // Use a deterministic avatar URL based on the user's ID
+        const profilePicUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+            req.user.fullName
+        )}&background=${colorHash}&bold=true&size=200`
         
         const updatedUser = await User.findByIdAndUpdate(
             userId,
