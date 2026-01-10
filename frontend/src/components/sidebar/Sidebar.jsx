@@ -10,7 +10,7 @@ const Sidebar = () => {
   const { authUser } = useAuthContext();
 
   return (
-    <div className="border-r border-slate-500 p-4 flex flex-col">
+    <div className="border-r border-slate-500 p-4 flex flex-col h-full">
       {/* Profile Section */}
       <div className="flex items-center gap-3 mb-4 p-3 bg-gray-800/40 rounded-lg">
         <div
@@ -35,8 +35,10 @@ const Sidebar = () => {
       </div>
 
       <SearchInput />
-      <div className="divider px-3"></div>
-      <Conversations />
+      <div className="divider px-3 my-2"></div>
+      <div className="flex-1 overflow-y-auto">
+        <Conversations />
+      </div>
       <LogoutButton />
 
       {/* Profile Settings Modal */}

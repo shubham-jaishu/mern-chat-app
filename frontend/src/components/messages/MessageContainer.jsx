@@ -8,7 +8,8 @@ import { useSocketContext } from "../../context/SocketContext";
 
 const MessageContainer = () => {
   const { selectedConversation, setSelectedConversation } = useConversation()
-  const { socket } = useSocketContext()
+  const { socket, onlineUsers } = useSocketContext()
+  const isOnline = onlineUsers.includes(selectedConversation?._id)
 
   useEffect(() => {
     return () => setSelectedConversation(null)
@@ -29,9 +30,29 @@ const MessageContainer = () => {
       ) : (
         <>
           {/* Header */}
-          <div className="bg-slate-500 px-4 py-2 mb-2">
-            <span className="label-text">To:</span>{" "}
-            <span className="text-gray-900 font-bold">{selectedConversation.fullName}</span>
+          <div className="bg-gradient-to-r from-gray-800 to-gray-900 px-6 py-4 mb-2 border-b border-gray-700 shadow-md">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-700 flex items-center justify-center">
+                  <img
+                    src={
+                      selectedConversation?.profilePic ||
+                      `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                        selectedConversation?.fullName
+                      )}&background=random&bold=true&size=48`
+                    }
+                    alt="avatar"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div>
+                  <p className="text-lg font-bold text-white">{selectedConversation?.fullName}</p>
+                  <p className={`text-xs font-medium ${isOnline ? "text-green-400" : "text-gray-400"}`}>
+                    {isOnline ? "Active now" : "Offline"}
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
           <Messages />
           <MessageInput />
